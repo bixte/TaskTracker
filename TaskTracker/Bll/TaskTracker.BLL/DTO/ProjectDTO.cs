@@ -14,7 +14,7 @@ namespace TaskTracker.BLL.DTO
         public DateTime? EndDate { get; set; }
 
         [EnumDataType(typeof(ProjectStatus))]
-        public string? Status { get; set; }
+        public ProjectStatus? Status { get; set; }
         public int? Priority { get; set; }
         public IEnumerable<ProjectTask>? Tasks { get; set; }
     }

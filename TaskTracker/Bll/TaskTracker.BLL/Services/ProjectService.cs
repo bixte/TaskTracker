@@ -1,16 +1,20 @@
 ﻿using AutoMapper;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using TaskTracker.BLL.BusinessModels.ProjectManagers.Filter;
+using TaskTracker.BLL.BusinessModels.ProjectManagers.Sort;
 using TaskTracker.BLL.DTO;
 using TaskTracker.BLL.Interfaces;
 using TaskTracker.DAL.Entities;
 using TaskTracker.DAL.Interfaces;
+using TaskTracker.Models.ProjectManagers;
+using TaskTracker.Models.ProjectManagers.Date;
 
 namespace TaskTracker.BLL.Services
 {
     public class ProjectService : IProjectService
     {
-        public IUnitOfWork DataBase { get; set; }
+        private readonly IUnitOfWork DataBase;
         public ProjectService(IUnitOfWork unitOfWork)
         {
             DataBase = unitOfWork;
@@ -26,7 +30,6 @@ namespace TaskTracker.BLL.Services
                 foreach (var result in results)
                     exceptionMessage.Append(result.ErrorMessage + '\n');
                 throw new Exception(exceptionMessage.ToString());
-
             }
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<ProjectDTO, Project>()).CreateMapper();
             var project = mapper.Map<ProjectDTO, Project>(projectDTO);
@@ -50,12 +53,33 @@ namespace TaskTracker.BLL.Services
 
         }
 
-
-
-        public IEnumerable<ProjectDTO> GetProjects()
+        public IEnumerable<ProjectDTO> GetProjects(ProjectStatus? filterByStatus,
+                                                   SortBy? sortByPriority,
+                                                   string? date,
+                                                   TypeSearchDate? typeSearchDate)
         {
+
+            var projects = DataBase.ProjectRepository.GetAll();
+            projects = SortAndFilter(projects, filterByStatus, sortByPriority, date, typeSearchDate);
+
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<Project, ProjectDTO>()).CreateMapper();
-            return mapper.Map<IEnumerable<Project>, List<ProjectDTO>>(DataBase.ProjectRepository.GetAll());
+
+            return mapper.Map<IEnumerable<Project>, List<ProjectDTO>>(projects);
+
+
+        }
+
+        private static IEnumerable<Project> SortAndFilter(IEnumerable<Project> projects,
+                                                   ProjectStatus? filterByStatus,
+                                                   SortBy? sortByPriority,
+                                                   string? date,
+                                                   TypeSearchDate? typeSearchDate)
+        {
+            var filterAndSort = new FilterAndSorterItems<Project>(new ProjectStatusFilter(filterByStatus),
+                                                                  new SortPriority(sortByPriority),
+                                                                  new DateSearch(date, typeSearchDate));
+            return filterAndSort.Process(projects);
+
         }
 
         public void RemoveProject(int? id)
@@ -85,7 +109,7 @@ namespace TaskTracker.BLL.Services
                 Name = projectDTO.Name is null ? project.Name : projectDTO.Name,
                 StartDate = projectDTO.StartDate is null ? project.StartDate : projectDTO.StartDate,
                 EndDate = projectDTO.EndDate is null ? project.EndDate : projectDTO.EndDate,
-                Status = projectDTO.Status is null ? project.Status : projectDTO.Status,
+                Status = projectDTO.Status is null ? project.Status : projectDTO.Status.ToString(),
                 Priority = projectDTO.Priority is null ? project.Priority : projectDTO.Priority.Value
             };
             DataBase.ProjectRepository.Update(updateProject);

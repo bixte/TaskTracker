@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using TaskTracker.Bll.TaskTracker.BLL.Interfaces;
+using TaskTracker.Bll.TaskTracker.BLL.Services;
 using TaskTracker.BLL.Interfaces;
 using TaskTracker.BLL.Services;
 using TaskTracker.DAL.Interfaces;
@@ -12,6 +14,7 @@ services.AddSwaggerGen();
 services.AddTransient<IUnitOfWork, EFUnitOfWork>();
 services.AddDbContext<TaskTracker.DAL.EF.TaskTrackerDB>(db => db.UseSqlServer(builder.Configuration.GetConnectionString("default")));
 services.AddTransient<IProjectService, ProjectService>();
+services.AddTransient<IProjectTaskService, ProjectTaskService>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

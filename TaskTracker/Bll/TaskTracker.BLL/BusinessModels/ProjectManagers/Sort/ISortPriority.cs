@@ -15,12 +15,18 @@ namespace TaskTracker.BLL.BusinessModels.ProjectManagers.Sort
         {
             this.sortBy = sortBy;
         }
-        public IQueryable<Project> Sort(IQueryable<Project> projects)
+        public IEnumerable<Project> Sort(IEnumerable<Project> projects)
         {
-            if (sortBy == SortBy.Desc)
-                return projects.OrderByDescending(p => p.Priority);
+            if (sortBy != null)
+            {
+                if (sortBy == SortBy.Desc)
+                    return projects.OrderByDescending(p => p.Priority);
+                else
+                    return projects.OrderBy(p => p.Priority);
+            }
             else
-                return projects.OrderBy(p => p.Priority);
+                return projects;
+            
         }
     }
 }

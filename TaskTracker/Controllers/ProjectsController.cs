@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using TaskTracker.Bll.TaskTracker.BLL.DTO;
+using TaskTracker.Bll.TaskTracker.BLL.Interfaces;
 using TaskTracker.BLL.BusinessModels.ProjectManagers;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Filter;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Sort;
@@ -16,42 +18,36 @@ namespace TaskTracker.Controllers
     [Route("[controller]")]
     public class ProjectsController : Controller
     {
-        readonly IProjectService projectService;
-        private readonly TaskTrackerDB dataBase;
-
-        public ProjectsController(IProjectService projectService, DAL.EF.TaskTrackerDB dataBase)
+        private readonly IProjectService projectService;
+        private readonly IProjectTaskService projectTaskService;
+        private readonly string success = "успешно"; 
+        public ProjectsController(IProjectService projectService, IProjectTaskService projectTaskService)
         {
             this.projectService = projectService;
-            this.dataBase = dataBase;
+            this.projectTaskService = projectTaskService;
         }
 
         [HttpGet]
         public ActionResult Index(int? id, ProjectStatus? filterByStatus, SortBy? sortByPriority, string? date, TypeSearchDate? typeSearchDate)
         {
-            if (id != null)
+            try
             {
-                var project = projectService.GetProject(id);
-                return Ok(project);
+                if (id != null)
+                {
+                    var project = projectService.GetProject(id);
+                    return Ok(project);
+                }
+                else
+                {
+                    var projectsTDO = projectService.GetProjects(filterByStatus, sortByPriority, date, typeSearchDate);
+                    return Ok(projectsTDO);
+                }
             }
-
-            else
+            catch (Exception ex)
             {
-                //были отчаянные попытки реализовать сортировку и фильтр через сервисы, но не успел и поставил заглушку :(
-                var projectManager = new ManagerProject<Project>();
-
-                if (filterByStatus is ProjectStatus status)
-                    projectManager.ProjectStatusFilter = new ProjectStatusFilter(status);
-
-                if (sortByPriority is SortBy sort)
-                    projectManager.SortByPriority = new SortPriority(sort);
-
-                if (date != null && typeSearchDate is TypeSearchDate typeSearch)
-                    projectManager.DateSearch = new ProjectDateSearch(date, typeSearch);
-
-                var projectStore = new ProjectStore(dataBase.Projects, projectManager);
-                var projects = projectStore.GetFilterAndSort();
-                return Ok(projects);
+                return BadRequest(ex.Message);
             }
+            
         }
 
         [HttpPost]
@@ -60,20 +56,20 @@ namespace TaskTracker.Controllers
             try
             {
                 projectService.CreateProject(projectDTO);
-                return Ok("успешно создан");
+                return Ok(success);
             }
-            catch (ValidationException ex) { return BadRequest(ex); }
+            catch (ValidationException ex) { return BadRequest(ex.Message); }
         }
 
         [HttpPut]
-        public ActionResult Update([FromRoute] int id, [FromBody] ProjectDTO projectDTO)
+        public ActionResult Update(ProjectDTO projectDTO)
         {
             projectService.UpdateProject(projectDTO);
             try
             {
                 return Ok(projectDTO);
             }
-            catch (ValidationException ex) { return BadRequest(ex); }
+            catch (ValidationException ex) { return BadRequest(ex.Message); }
         }
 
         [HttpDelete]
@@ -82,59 +78,49 @@ namespace TaskTracker.Controllers
             try
             {
                 projectService.RemoveProject(id);
-                return Ok("успешно удален");
+                return Ok(success);
             }
-            catch (ValidationException ex) { return BadRequest(ex); }
+            catch (ValidationException ex) { return BadRequest(ex.Message); }
         }
 
         [HttpGet]
         [Route("/tasks")]
-        public ActionResult GetTasks([FromQuery] int? projectId)
+        public ActionResult GetTasks([FromQuery] int? projectId, SortBy? sortPriority)
         {
-            if (projectId != null)
+            try
             {
-                var tasks =  dataBase.Tasks.Where(t => t.ProjectId == projectId);
-                if (tasks != null)
-                    return Ok(tasks);
-                else
-                    return BadRequest("задания не найдены");
+                var projectsTasks = projectTaskService.GetProjectTasks(projectId, sortPriority);
+                return Ok(projectsTasks);
+
             }
-            else
-            {
-                var allTasks = dataBase.Tasks;
-                return Ok(allTasks);
-            }
+            catch (ValidationException ex) { return BadRequest(ex.Message); }
 
         }
 
         [HttpGet]
         [Route("/tasks/{id}")]
-        public async Task<ActionResult> GetTask([FromRoute] int id)
+        public ActionResult GetTask([FromRoute] int id)
         {
-            var task = await dataBase.Tasks.FindAsync(id);
-            if (task != null)
-                return Ok(task);
-            else
-                return BadRequest("задание не найдено");
+            try
+            {
+                var projectsTasks = projectTaskService.GetProjectTask(id);
+                return Ok(projectsTasks);
+
+            }
+            catch (ValidationException ex) { return BadRequest(ex.Message); }
 
         }
 
         [HttpPost]
         [Route("/tasks/")]
-        public async Task<ActionResult> CreateTask(ProjectTask task)
+        public ActionResult CreateTask(ProjectTaskDTO task)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var project = await dataBase.Projects.FindAsync(task.ProjectId);
-                if (project != null)
-                {
-                    await dataBase.Tasks.AddAsync(task);
-                    await dataBase.SaveChangesAsync();
-                }
-                return Ok("успешно");
+                projectTaskService.CreateProjectTask(task);
+                return Ok(success);
             }
-            else
-                return BadRequest("модель оказалась не валидной");
+            catch (ValidationException ex) { return BadRequest(ex.Message); }
         }
 
     }

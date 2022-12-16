@@ -1,33 +1,41 @@
-﻿using TaskTracker.DAL.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using TaskTracker.DAL.Entities;
 
 namespace TaskTracker.Models.ProjectManagers.Date
 {
-    public class ProjectDateSearch : ISearchByDate<Project>
+    public class DateSearch : ISearchByDate<Project>
     {
         private readonly string? searchDate;
-        private readonly TypeSearchDate typeSearchDate;
+        private readonly TypeSearchDate? typeSearchDate;
 
-        public ProjectDateSearch(string date, TypeSearchDate typeSearchDate)
+        public DateSearch(string? date, TypeSearchDate? typeSearchDate)
         {
             searchDate = date;
             this.typeSearchDate = typeSearchDate;
         }
 
-        public IQueryable<Project> Search(IQueryable<Project> projects)
+        public IEnumerable<Project> Search(IEnumerable<Project> project)
         {
-            if (DateTime.TryParse(searchDate, out DateTime date))
+            if (searchDate != null && typeSearchDate.HasValue)
             {
-               return typeSearchDate switch
+                if (DateTime.TryParse(searchDate, out DateTime date))
                 {
-                    TypeSearchDate.Start => projects.Where(p => p.StartDate == date),
-                    TypeSearchDate.End => projects.Where(p => p.EndDate == date),
-                    TypeSearchDate.StartRange => projects.Where(p => p.StartDate >= date),
-                    TypeSearchDate.EndRange => projects.Where(p => p.EndDate <= date),
-                    _ => projects,
-                };
+                    return typeSearchDate switch
+                    {
+                        TypeSearchDate.Start => project.Where(p => p.StartDate == date),
+                        TypeSearchDate.End => project.Where(p => p.EndDate == date),
+                        TypeSearchDate.StartRange => project.Where(p => p.StartDate >= date),
+                        TypeSearchDate.EndRange => project.Where(p => p.EndDate <= date),
+                        _ => project,
+                    };
+                }
+                else
+                    throw new ValidationException("неверный формат даты");
             }
             else
-                throw new Exception("неверный формат даты");
+                return project;
+           
+
         }
     }
 }

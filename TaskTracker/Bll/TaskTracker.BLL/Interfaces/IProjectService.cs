@@ -10,7 +10,7 @@ namespace TaskTracker.BLL.Interfaces
         void CreateProject(ProjectDTO projectDTO);
         void UpdateProject(ProjectDTO projectDTO);
         ProjectDTO GetProject(int? id);
-        IEnumerable<ProjectDTO> GetProjects();
+        IEnumerable<ProjectDTO> GetProjects(ProjectStatus? filterByStatus, SortBy? sortByPriority, string? date, TypeSearchDate? typeSearchDate);
         void RemoveProject(int? id);
         void Dispose();
     }
