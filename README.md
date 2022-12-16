@@ -8,12 +8,12 @@
 > ###### Для изменения используется http-method =**Put**
 > ###### Для удаления используется http-method = **Delete**
 
-## Вариации сортировки и фильтрации Projects:
-FilterByStatus принимающий значение Enum(NotStarted, Active, Completed)
-sortByPriority принимающий значение Enum(Asc, Desc)
-date **применяется вместе с typeSearchDate** для поиска определенной даты начала ||определенной даты конца || от даты налача || до даты конца 
+##  Вариации сортировки и фильтрации Projects:
+#### 1. FilterByStatus принимающий значение Enum(NotStarted, Active, Completed)
+#### 2. SortByPriority принимающий значение Enum(Asc, Desc)
+#### 3. Date **применяется вместе с typeSearchDate** для поиска определенной даты начала || определенной даты конца || от даты налача || до даты конца 
 
-##Вариации сортировки и фильтрации Tasks:
-sortByPriority принимающий значение Enum(Asc, Desc)
-FilterByStatus принимающий значение Enum(ToDo, InProgress, Done)
+## Вариации сортировки и фильтрации Tasks:
+#### 1. SortByPriority принимающий значение Enum(Asc, Desc)
+#### 2. FilterByStatus принимающий значение Enum(ToDo, InProgress, Done)
 
