@@ -1,15 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using TaskTracker.Bll.TaskTracker.BLL.DTO;
 using TaskTracker.Bll.TaskTracker.BLL.Interfaces;
-using TaskTracker.BLL.BusinessModels.ProjectManagers;
-using TaskTracker.BLL.BusinessModels.ProjectManagers.Filter;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Sort;
-using TaskTracker.BLL.DTO;
+using TaskTracker.BLL.DTO.Project;
+using TaskTracker.BLL.DTO.ProjectTask;
 using TaskTracker.BLL.Interfaces;
-using TaskTracker.DAL.EF;
-using TaskTracker.DAL.Entities;
-using TaskTracker.Models.ProjectManagers;
 using TaskTracker.Models.ProjectManagers.Date;
 
 namespace TaskTracker.Controllers
@@ -20,7 +15,7 @@ namespace TaskTracker.Controllers
     {
         private readonly IProjectService projectService;
         private readonly IProjectTaskService projectTaskService;
-        private readonly string success = "успешно"; 
+        private readonly string success = "успешно";
         public ProjectsController(IProjectService projectService, IProjectTaskService projectTaskService)
         {
             this.projectService = projectService;
@@ -47,7 +42,7 @@ namespace TaskTracker.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            
+
         }
 
         [HttpPost]
@@ -62,12 +57,12 @@ namespace TaskTracker.Controllers
         }
 
         [HttpPut]
-        public ActionResult Update(ProjectDTO projectDTO)
+        public ActionResult Update(ProjectUpdateDTO projectUpdateDTO)
         {
-            projectService.UpdateProject(projectDTO);
+            projectService.UpdateProject(projectUpdateDTO);
             try
             {
-                return Ok(projectDTO);
+                return Ok(success);
             }
             catch (ValidationException ex) { return BadRequest(ex.Message); }
         }

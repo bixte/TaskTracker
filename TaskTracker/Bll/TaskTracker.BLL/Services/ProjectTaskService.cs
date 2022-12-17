@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using TaskTracker.Bll.TaskTracker.BLL.DTO;
 using TaskTracker.Bll.TaskTracker.BLL.Interfaces;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Sort;
-using TaskTracker.BLL.DTO;
+using TaskTracker.BLL.DTO.ProjectTask;
 using TaskTracker.DAL.Entities;
 using TaskTracker.DAL.Interfaces;
-using TaskTracker.Models.ProjectManagers.Date;
 
 namespace TaskTracker.Bll.TaskTracker.BLL.Services
 {
@@ -55,15 +53,15 @@ namespace TaskTracker.Bll.TaskTracker.BLL.Services
 
         }
 
-        public IEnumerable<ProjectTaskDTO> GetProjectTasks(int?projectId, SortBy? sortByPriority)
+        public IEnumerable<ProjectTaskDTO> GetProjectTasks(int? projectId, SortBy? sortByPriority)
         {
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<ProjectTask,ProjectTaskDTO>()).CreateMapper();
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<ProjectTask, ProjectTaskDTO>()).CreateMapper();
             var projectTasks = DataBase.TaskRepository.GetAll();
-            
+
             var projectTasksDTO = mapper.Map<IEnumerable<ProjectTask>, IEnumerable<ProjectTaskDTO>>(projectTasks);
             if (projectId != null)
                 return projectTasksDTO.Where(t => t.ProjectId == projectId.Value);
-               
+
             return projectTasksDTO;
         }
 
@@ -91,9 +89,9 @@ namespace TaskTracker.Bll.TaskTracker.BLL.Services
                 Description = projectTaskDTO.Description is null ? projectTask.Description : projectTaskDTO.Description,
                 Status = projectTaskDTO.Status is null ? projectTask.Status : projectTaskDTO.Status.Value.ToString(),
                 Priority = projectTaskDTO.Priority is null ? projectTask.Priority : projectTaskDTO.Priority,
-                ProjectId = projectTaskDTO.ProjectId >0 ? projectTask.ProjectId : projectTaskDTO.ProjectId
+                ProjectId = projectTaskDTO.ProjectId > 0 ? projectTask.ProjectId : projectTaskDTO.ProjectId
             };
-            
+
 
             DataBase.TaskRepository.Update(projectTaskUpdate);
         }

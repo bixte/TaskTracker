@@ -20,9 +20,9 @@ namespace TaskTracker.Models.ProjectManagers
         {
             if (ProjectStatusFilter != null)
                 items = ProjectStatusFilter.Filter(items);
-            if (SortByPriority !=null)
+            if (SortByPriority != null)
                 items = SortByPriority.Sort(items);
-            if (DateSearch !=null)
+            if (DateSearch != null)
                 items = DateSearch.Search(items);
 
             return items;

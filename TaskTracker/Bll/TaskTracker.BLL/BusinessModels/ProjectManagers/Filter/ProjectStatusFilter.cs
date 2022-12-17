@@ -1,4 +1,5 @@
-﻿using TaskTracker.DAL.Entities;
+﻿using TaskTracker.BLL.DTO.Project;
+using TaskTracker.DAL.Entities;
 
 namespace TaskTracker.BLL.BusinessModels.ProjectManagers.Filter
 {
@@ -22,8 +23,8 @@ namespace TaskTracker.BLL.BusinessModels.ProjectManagers.Filter
             if (projectStatus != null)
                 return items.Where(i => i.Status == projectStatus.Value.ToString());
             else
-               return items;
-            
+                return items;
+
         }
     }
 }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Filter;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Sort;
-using TaskTracker.BLL.DTO;
+using TaskTracker.BLL.DTO.Project;
 using TaskTracker.BLL.Interfaces;
 using TaskTracker.DAL.Entities;
 using TaskTracker.DAL.Interfaces;
@@ -94,25 +94,31 @@ namespace TaskTracker.BLL.Services
             DataBase.ProjectRepository.Delete(project);
         }
 
-        public void UpdateProject(ProjectDTO projectDTO)
+        public void UpdateProject(ProjectUpdateDTO projectUpdateDTO)
         {
-            if (projectDTO.Id == null)
+            if (projectUpdateDTO.Id == null)
                 throw new ValidationException("не указан id");
 
-            var project = DataBase.ProjectRepository.Get(projectDTO.Id.Value);
+            var project = DataBase.ProjectRepository.Get(projectUpdateDTO.Id.Value);
             if (project == null)
                 throw new ValidationException("id указан неверно");
 
-            var updateProject = new Project
-            {
-                Id = project.Id,
-                Name = projectDTO.Name is null ? project.Name : projectDTO.Name,
-                StartDate = projectDTO.StartDate is null ? project.StartDate : projectDTO.StartDate,
-                EndDate = projectDTO.EndDate is null ? project.EndDate : projectDTO.EndDate,
-                Status = projectDTO.Status is null ? project.Status : projectDTO.Status.ToString(),
-                Priority = projectDTO.Priority is null ? project.Priority : projectDTO.Priority.Value
-            };
-            DataBase.ProjectRepository.Update(updateProject);
+            if (projectUpdateDTO.Name != null)
+                project.Name = projectUpdateDTO.Name;
+
+            if (projectUpdateDTO.StartDate.HasValue)
+                project.StartDate = projectUpdateDTO.StartDate;
+
+            if (projectUpdateDTO.EndDate.HasValue)
+                project.EndDate = projectUpdateDTO.EndDate;
+
+            if (projectUpdateDTO.Status != null)
+                project.Status = projectUpdateDTO.Status.Value.ToString();
+
+            if (projectUpdateDTO.Priority > 0)
+                project.Priority = projectUpdateDTO.Priority;
+
+            DataBase.ProjectRepository.Update(project);
             DataBase.Save();
 
         }

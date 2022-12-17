@@ -26,7 +26,7 @@ namespace TaskTracker.BLL.BusinessModels.ProjectManagers.Sort
             }
             else
                 return projects;
-            
+
         }
     }
 }

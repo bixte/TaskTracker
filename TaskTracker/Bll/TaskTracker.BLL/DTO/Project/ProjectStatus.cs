@@ -1,10 +1,10 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace TaskTracker.DAL.Entities
+namespace TaskTracker.BLL.DTO.Project
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum TaskStatus
+    public enum ProjectStatus
     {
-        ToDo, InProgress, Done
+        NotStarted, Active, Completed
     }
 }

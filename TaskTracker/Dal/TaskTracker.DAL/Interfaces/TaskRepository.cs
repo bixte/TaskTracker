@@ -15,9 +15,9 @@ namespace TaskTracker.DAL.Interfaces
         public ProjectTask Get(int id) => dataBase.Tasks.Find(id) ?? throw new Exception("не найден");
 
         public IEnumerable<ProjectTask> GetAll() => dataBase.Tasks;
-        public IEnumerable<ProjectTask> GetAll(int projectId) => dataBase.Tasks.Where(t=>t.ProjectId ==projectId);
+        public IEnumerable<ProjectTask> GetAll(int projectId) => dataBase.Tasks.Where(t => t.ProjectId == projectId);
 
-   
+
 
         public void Update(ProjectTask item)
         {

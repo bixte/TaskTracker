@@ -1,6 +1,5 @@
-﻿using TaskTracker.Bll.TaskTracker.BLL.DTO;
-using TaskTracker.BLL.BusinessModels.ProjectManagers.Sort;
-using TaskTracker.BLL.DTO;
+﻿using TaskTracker.BLL.BusinessModels.ProjectManagers.Sort;
+using TaskTracker.BLL.DTO.ProjectTask;
 
 namespace TaskTracker.Bll.TaskTracker.BLL.Interfaces
 {

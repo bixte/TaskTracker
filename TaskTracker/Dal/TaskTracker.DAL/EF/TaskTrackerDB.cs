@@ -5,7 +5,7 @@ namespace TaskTracker.DAL.EF
 {
     public class TaskTrackerDB : DbContext
     {
-       
+
         public TaskTrackerDB(DbContextOptions options) : base(options)
         {
             if (Database.EnsureCreated())

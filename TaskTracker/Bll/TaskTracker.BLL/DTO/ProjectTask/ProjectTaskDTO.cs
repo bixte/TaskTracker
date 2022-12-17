@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TaskTracker.Bll.TaskTracker.BLL.DTO
+namespace TaskTracker.BLL.DTO.ProjectTask
 {
     public class ProjectTaskDTO
     {
