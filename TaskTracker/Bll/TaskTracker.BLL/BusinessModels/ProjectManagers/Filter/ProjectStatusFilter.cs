@@ -1,5 +1,4 @@
-﻿using TaskTracker.BLL.DTO.Project;
-using TaskTracker.DAL.Entities;
+﻿using TaskTracker.DAL.Entities;
 
 namespace TaskTracker.BLL.BusinessModels.ProjectManagers.Filter
 {
@@ -10,9 +9,9 @@ namespace TaskTracker.BLL.BusinessModels.ProjectManagers.Filter
 
     public class ProjectStatusFilter : IProjectStatusFilter
     {
-        private readonly ProjectStatus? projectStatus;
+        private readonly DTO.Project.ProjectStatus? projectStatus;
 
-        public ProjectStatusFilter(ProjectStatus? projectStatus)
+        public ProjectStatusFilter(DTO.Project.ProjectStatus? projectStatus)
         {
 
             this.projectStatus = projectStatus;

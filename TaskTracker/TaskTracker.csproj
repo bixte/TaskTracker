@@ -1,20 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<OutputType>Exe</OutputType>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+		<None Include="Bll\TaskTracker.BLL\TaskTracker.BLL.csproj" />
+		<None Include="Dal\TaskTracker.DAL\TaskTracker.DAL.csproj" />
+	</ItemGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="12.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.12" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="Bll\TaskTracker.BLL\TaskTracker.BLL.csproj" />
-    <None Include="Dal\TaskTracker.DAL\TaskTracker.DAL.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+	  <Reference Include="TaskTracker.BLL">
+	    <HintPath>..\..\VsProjects\TaskTracker\Bll\TaskTracker.BLL\obj\Debug\net6.0\ref\TaskTracker.BLL.dll</HintPath>
+	  </Reference>
+	  <Reference Include="TaskTracker.DAL">
+	    <HintPath>..\..\VsProjects\TaskTracker\Dal\TaskTracker.DAL\obj\Debug\net6.0\ref\TaskTracker.DAL.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="12.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.12" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-  </ItemGroup>
+	<ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

@@ -6,7 +6,7 @@ namespace TaskTracker.BLL.Interfaces
 {
     public interface IProjectService
     {
-        void CreateProject(ProjectDTO projectDTO);
+        void CreateProject(ProjectPostDTO projectDTO);
         void UpdateProject(ProjectUpdateDTO projectDTO);
         ProjectDTO GetProject(int? id);
         IEnumerable<ProjectDTO> GetProjects(ProjectStatus? filterByStatus, SortBy? sortByPriority, string? date, TypeSearchDate? typeSearchDate);

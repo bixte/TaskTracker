@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using TaskTracker.BLL.Binders;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Filter;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Sort;
 using TaskTracker.BLL.DTO.Project;
@@ -19,7 +20,7 @@ namespace TaskTracker.BLL.Services
         {
             DataBase = unitOfWork;
         }
-        public void CreateProject(ProjectDTO projectDTO)
+        public void CreateProject(ProjectPostDTO projectDTO)
         {
             var context = new ValidationContext(projectDTO);
             var results = new List<ValidationResult>();
@@ -31,8 +32,8 @@ namespace TaskTracker.BLL.Services
                     exceptionMessage.Append(result.ErrorMessage + '\n');
                 throw new Exception(exceptionMessage.ToString());
             }
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<ProjectDTO, Project>()).CreateMapper();
-            var project = mapper.Map<ProjectDTO, Project>(projectDTO);
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<ProjectPostDTO, Project>()).CreateMapper();
+            var project = mapper.Map<ProjectPostDTO, Project>(projectDTO);
             DataBase.ProjectRepository.Create(project);
             DataBase.Save();
         }
@@ -53,7 +54,7 @@ namespace TaskTracker.BLL.Services
 
         }
 
-        public IEnumerable<ProjectDTO> GetProjects(ProjectStatus? filterByStatus,
+        public IEnumerable<ProjectDTO> GetProjects(DTO.Project.ProjectStatus? filterByStatus,
                                                    SortBy? sortByPriority,
                                                    string? date,
                                                    TypeSearchDate? typeSearchDate)
@@ -70,7 +71,7 @@ namespace TaskTracker.BLL.Services
         }
 
         private static IEnumerable<Project> SortAndFilter(IEnumerable<Project> projects,
-                                                   ProjectStatus? filterByStatus,
+                                                   DTO.Project.ProjectStatus? filterByStatus,
                                                    SortBy? sortByPriority,
                                                    string? date,
                                                    TypeSearchDate? typeSearchDate)
@@ -103,22 +104,10 @@ namespace TaskTracker.BLL.Services
             if (project == null)
                 throw new ValidationException("id указан неверно");
 
-            if (projectUpdateDTO.Name != null)
-                project.Name = projectUpdateDTO.Name;
+            var projectBinder = new ProjectBinder(project, projectUpdateDTO.Name, projectUpdateDTO.StartDate, projectUpdateDTO.EndDate, projectUpdateDTO.Status, projectUpdateDTO.Priority);
+            var projectUpdate = projectBinder.Bind();
 
-            if (projectUpdateDTO.StartDate.HasValue)
-                project.StartDate = projectUpdateDTO.StartDate;
-
-            if (projectUpdateDTO.EndDate.HasValue)
-                project.EndDate = projectUpdateDTO.EndDate;
-
-            if (projectUpdateDTO.Status != null)
-                project.Status = projectUpdateDTO.Status.Value.ToString();
-
-            if (projectUpdateDTO.Priority > 0)
-                project.Priority = projectUpdateDTO.Priority;
-
-            DataBase.ProjectRepository.Update(project);
+            DataBase.ProjectRepository.Update(projectUpdate);
             DataBase.Save();
 
         }

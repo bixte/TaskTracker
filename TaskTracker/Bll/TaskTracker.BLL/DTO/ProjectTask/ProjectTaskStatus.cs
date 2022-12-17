@@ -3,7 +3,7 @@
 namespace TaskTracker.BLL.DTO.ProjectTask
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum TaskStatus
+    public enum ProjectTaskStatus
     {
         ToDo, InProgress, Done
     }

@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using TaskTracker.Bll.TaskTracker.BLL.Interfaces;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Sort;
 using TaskTracker.BLL.DTO.Project;
-using TaskTracker.BLL.DTO.ProjectTask;
 using TaskTracker.BLL.Interfaces;
 using TaskTracker.Models.ProjectManagers.Date;
 
@@ -14,29 +13,32 @@ namespace TaskTracker.Controllers
     public class ProjectsController : Controller
     {
         private readonly IProjectService projectService;
-        private readonly IProjectTaskService projectTaskService;
         private readonly string success = "успешно";
-        public ProjectsController(IProjectService projectService, IProjectTaskService projectTaskService)
+        public ProjectsController(IProjectService projectService)
         {
             this.projectService = projectService;
-            this.projectTaskService = projectTaskService;
         }
 
         [HttpGet]
-        public ActionResult Index(int? id, ProjectStatus? filterByStatus, SortBy? sortByPriority, string? date, TypeSearchDate? typeSearchDate)
+        public ActionResult GetProjects(ProjectStatus? filterByStatus, SortBy? sortByPriority, string? date, TypeSearchDate? typeSearchDate)
         {
             try
             {
-                if (id != null)
-                {
-                    var project = projectService.GetProject(id);
-                    return Ok(project);
-                }
-                else
-                {
-                    var projectsTDO = projectService.GetProjects(filterByStatus, sortByPriority, date, typeSearchDate);
-                    return Ok(projectsTDO);
-                }
+                var projectsTDO = projectService.GetProjects(filterByStatus, sortByPriority, date, typeSearchDate);
+                return Ok(projectsTDO);
+
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult GetProjects([FromRoute] int id)
+        {
+            try
+            {
+                var projectsTDO = projectService.GetProject(id);
+                return Ok(projectsTDO);
+
             }
             catch (Exception ex)
             {
@@ -46,7 +48,7 @@ namespace TaskTracker.Controllers
         }
 
         [HttpPost]
-        public ActionResult CreateProject(ProjectDTO projectDTO)
+        public ActionResult CreateProject(ProjectPostDTO projectDTO)
         {
             try
             {
@@ -57,7 +59,7 @@ namespace TaskTracker.Controllers
         }
 
         [HttpPut]
-        public ActionResult Update(ProjectUpdateDTO projectUpdateDTO)
+        public ActionResult UpdateProject(ProjectUpdateDTO projectUpdateDTO)
         {
             projectService.UpdateProject(projectUpdateDTO);
             try
@@ -68,7 +70,7 @@ namespace TaskTracker.Controllers
         }
 
         [HttpDelete]
-        public ActionResult Remove(int id)
+        public ActionResult RemoveProject(int id)
         {
             try
             {
@@ -78,45 +80,7 @@ namespace TaskTracker.Controllers
             catch (ValidationException ex) { return BadRequest(ex.Message); }
         }
 
-        [HttpGet]
-        [Route("/tasks")]
-        public ActionResult GetTasks([FromQuery] int? projectId, SortBy? sortPriority)
-        {
-            try
-            {
-                var projectsTasks = projectTaskService.GetProjectTasks(projectId, sortPriority);
-                return Ok(projectsTasks);
 
-            }
-            catch (ValidationException ex) { return BadRequest(ex.Message); }
-
-        }
-
-        [HttpGet]
-        [Route("/tasks/{id}")]
-        public ActionResult GetTask([FromRoute] int id)
-        {
-            try
-            {
-                var projectsTasks = projectTaskService.GetProjectTask(id);
-                return Ok(projectsTasks);
-
-            }
-            catch (ValidationException ex) { return BadRequest(ex.Message); }
-
-        }
-
-        [HttpPost]
-        [Route("/tasks/")]
-        public ActionResult CreateTask(ProjectTaskDTO task)
-        {
-            try
-            {
-                projectTaskService.CreateProjectTask(task);
-                return Ok(success);
-            }
-            catch (ValidationException ex) { return BadRequest(ex.Message); }
-        }
 
     }
 }
