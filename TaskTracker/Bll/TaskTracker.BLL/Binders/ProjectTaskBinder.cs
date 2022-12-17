@@ -1,5 +1,5 @@
 ﻿using TaskTracker.BLL.DTO.ProjectTask;
-using TaskTracker.DAL.Entities;
+using TaskTracker.DAL.Entity;
 
 namespace TaskTracker.BLL.Binders
 {

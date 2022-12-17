@@ -4,8 +4,6 @@ using TaskTracker.Bll.TaskTracker.BLL.DTO.ProjectTask;
 using TaskTracker.Bll.TaskTracker.BLL.Interfaces;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Sort;
 using TaskTracker.BLL.DTO.ProjectTask;
-using TaskTracker.BLL.Interfaces;
-
 namespace TaskTracker.Controllers
 {
     [Route("[controller]")]
@@ -20,12 +18,11 @@ namespace TaskTracker.Controllers
             this.projectTaskService = projectTaskService;
         }
 
-        [HttpGet(Order = 2)]
-        public ActionResult GetTasks(SortBy? sortPriority)
+        public ActionResult GetTasks(SortBy? sortPriority, ProjectTaskStatus? filterByStatus)
         {
             try
             {
-                var projectsTasks = projectTaskService.GetProjectTasks(sortPriority);
+                var projectsTasks = projectTaskService.GetProjectTasks(sortPriority, filterByStatus);
                 return Ok(projectsTasks);
 
             }

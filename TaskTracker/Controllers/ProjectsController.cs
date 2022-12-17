@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using TaskTracker.Bll.TaskTracker.BLL.Interfaces;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Sort;
 using TaskTracker.BLL.DTO.Project;
 using TaskTracker.BLL.Interfaces;
@@ -20,16 +19,17 @@ namespace TaskTracker.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetProjects(ProjectStatus? filterByStatus, SortBy? sortByPriority, string? date, TypeSearchDate? typeSearchDate)
+        public ActionResult GetProjects(ProjectStatus? filterByStatus, SortBy? sortByPriority, string? date, TypeSearchDate? typeSearchDate, bool withTasks = false)
         {
             try
             {
-                var projectsTDO = projectService.GetProjects(filterByStatus, sortByPriority, date, typeSearchDate);
+                var projectsTDO = projectService.GetProjects(withTasks, filterByStatus, sortByPriority, date, typeSearchDate);
                 return Ok(projectsTDO);
 
             }
             catch (Exception ex) { return BadRequest(ex.Message); }
         }
+
 
         [HttpGet("{id}")]
         public ActionResult GetProjects([FromRoute] int id)

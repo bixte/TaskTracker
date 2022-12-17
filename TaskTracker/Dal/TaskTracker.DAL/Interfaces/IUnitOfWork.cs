@@ -1,4 +1,4 @@
-﻿using TaskTracker.DAL.Entities;
+﻿using TaskTracker.DAL.Entity;
 
 namespace TaskTracker.DAL.Interfaces
 {

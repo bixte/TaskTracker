@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using TaskTracker.Bll.TaskTracker.BLL.DTO.ProjectTask;
 using TaskTracker.Bll.TaskTracker.BLL.Interfaces;
 using TaskTracker.BLL.Binders;
+using TaskTracker.BLL.BusinessModels.ProjectManagers.Filter;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Sort;
 using TaskTracker.BLL.DTO.ProjectTask;
-using TaskTracker.DAL.Entities;
+using TaskTracker.DAL.Entity;
 using TaskTracker.DAL.Interfaces;
+using TaskTracker.Models.ProjectManagers;
 
 namespace TaskTracker.Bll.TaskTracker.BLL.Services
 {
@@ -21,20 +22,18 @@ namespace TaskTracker.Bll.TaskTracker.BLL.Services
         public void Dispose() => DataBase.Dispose();
         public void CreateProjectTask(ProjectTaskPostDTO projectTaskDTO)
         {
+            var project = DataBase.ProjectRepository.Get(projectTaskDTO.ProjectId);
+            if (project == null)
+                throw new ValidationException("указан id несущестующего проекта");
+
             var context = new ValidationContext(projectTaskDTO);
             var results = new List<ValidationResult>();
-            if (!Validator.TryValidateObject(projectTaskDTO, context, results))
-            {
-                var exceptionMessage = new StringBuilder();
-                foreach (var result in results)
-                    exceptionMessage.Append(result.ErrorMessage + '\n');
-                throw new Exception(exceptionMessage.ToString());
-
-            }
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<ProjectTaskPostDTO, ProjectTask>()).CreateMapper();
             var projectTask = mapper.Map<ProjectTaskPostDTO, ProjectTask>(projectTaskDTO);
 
             DataBase.TaskRepository.Create(projectTask);
+            DataBase.Save();
+
         }
 
 
@@ -55,13 +54,17 @@ namespace TaskTracker.Bll.TaskTracker.BLL.Services
 
         }
 
-        public IEnumerable<ProjectTaskDTO> GetProjectTasks(SortBy? sortByPriority)
+        public IEnumerable<ProjectTaskDTO> GetProjectTasks(SortBy? sortByPriority, ProjectTaskStatus? filterByStatus)
         {
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<ProjectTask, ProjectTaskDTO>()).CreateMapper();
             var projectTasks = DataBase.TaskRepository.GetAll();
 
-            var projectTasksDTO = mapper.Map<IEnumerable<ProjectTask>, IEnumerable<ProjectTaskDTO>>(projectTasks);
-           
+            var filterAndSorterItems = new FilterAndSorterItems<ProjectTask>(new ProjectTaskFilter(filterByStatus), new SortTaskPriority(sortByPriority), null, null);
+            var collectTasks = filterAndSorterItems.Process(projectTasks).AsEnumerable();
+
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<ProjectTask, ProjectTaskDTO>()).CreateMapper();
+
+            var projectTasksDTO = mapper.Map<IEnumerable<ProjectTask>, IEnumerable<ProjectTaskDTO>>(collectTasks);
+
             return projectTasksDTO;
         }
 

@@ -2,7 +2,7 @@
 {
     public interface ISearchByDate<T>
     {
-        public IEnumerable<T> Search(IEnumerable<T> items);
+        public IQueryable<T> Search(IQueryable<T> items);
 
     }
 }

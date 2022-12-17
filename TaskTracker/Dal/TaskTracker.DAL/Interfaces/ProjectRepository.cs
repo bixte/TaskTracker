@@ -1,5 +1,6 @@
-﻿using TaskTracker.DAL.EF;
-using TaskTracker.DAL.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using TaskTracker.DAL.EF;
+using TaskTracker.DAL.Entity;
 
 namespace TaskTracker.DAL.Interfaces
 {
@@ -25,10 +26,15 @@ namespace TaskTracker.DAL.Interfaces
 
         public Project Get(int id)
         {
-            return dataBase.Projects.Find(id) ?? throw new Exception("не найден");
+            var project = dataBase.Projects.Find(id);
+            if (project == null)
+                throw new ValidationException("не найден");
+
+            dataBase.Entry(project).Collection(p => p.Tasks).Load();
+            return project;
         }
 
-        public IEnumerable<Project> GetAll() => dataBase.Projects;
+        public IQueryable<Project> GetAll() => dataBase.Projects;
 
         public void Update(Project item)
         {

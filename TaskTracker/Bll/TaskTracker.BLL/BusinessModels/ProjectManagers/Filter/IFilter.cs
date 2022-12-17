@@ -2,6 +2,6 @@
 {
     public interface IFilter<T>
     {
-        public IEnumerable<T> Filter(IEnumerable<T> items);
+        public IQueryable<T> Filter(IQueryable<T> items);
     }
 }

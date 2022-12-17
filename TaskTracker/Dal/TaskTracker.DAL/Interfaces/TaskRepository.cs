@@ -1,5 +1,6 @@
-﻿using TaskTracker.DAL.EF;
-using TaskTracker.DAL.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using TaskTracker.DAL.EF;
+using TaskTracker.DAL.Entity;
 
 namespace TaskTracker.DAL.Interfaces
 {
@@ -8,20 +9,31 @@ namespace TaskTracker.DAL.Interfaces
         private readonly TaskTrackerDB dataBase;
 
         public TaskRepository(TaskTrackerDB dataBase) => this.dataBase = dataBase;
-        public void Create(ProjectTask item) => dataBase.Tasks.Add(item);
+        public void Create(ProjectTask task)
+        {
+            dataBase.Tasks.Add(task);
+            dataBase.SaveChanges();
+        }
 
-        public void Delete(ProjectTask item) => dataBase.Tasks.Remove(item);
+        public void Delete(ProjectTask item)
+        {
+            dataBase.Tasks.Remove(item);
+            dataBase.SaveChanges();
+        }
 
-        public ProjectTask Get(int id) => dataBase.Tasks.Find(id) ?? throw new Exception("не найден");
+        public ProjectTask Get(int id) => dataBase.Tasks.Find(id) ?? throw new ValidationException("не найден");
 
-        public IEnumerable<ProjectTask> GetAll() => dataBase.Tasks;
-        public IEnumerable<ProjectTask> GetAll(int projectId) => dataBase.Tasks.Where(t => t.ProjectId == projectId);
+        public IQueryable<ProjectTask> GetAll() => dataBase.Tasks;
+        public IQueryable<ProjectTask> GetAll(int projectId) => dataBase.Tasks.Where(t => t.ProjectId == projectId);
 
 
 
         public void Update(ProjectTask item)
         {
             dataBase.Entry(item).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            dataBase.SaveChanges();
         }
+
+
     }
 }

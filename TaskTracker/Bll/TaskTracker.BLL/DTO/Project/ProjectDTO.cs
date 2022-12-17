@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using TaskTracker.BLL.DTO.ProjectTask;
 
 namespace TaskTracker.BLL.DTO.Project
 {
@@ -15,5 +16,7 @@ namespace TaskTracker.BLL.DTO.Project
         [EnumDataType(typeof(ProjectStatus))]
         public ProjectStatus? Status { get; set; }
         public int? Priority { get; set; }
+
+        public IEnumerable<ProjectTaskDTO>? Tasks { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace TaskTracker.DAL.Entities
+﻿namespace TaskTracker.DAL.Entity
 {
     public class ProjectTask
     {

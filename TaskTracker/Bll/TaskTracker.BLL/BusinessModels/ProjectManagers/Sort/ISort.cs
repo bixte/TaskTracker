@@ -2,6 +2,6 @@
 {
     public interface ISort<T>
     {
-        public IEnumerable<T> Sort(IEnumerable<T> items);
+        public IQueryable<T> Sort(IQueryable<T> items);
     }
 }

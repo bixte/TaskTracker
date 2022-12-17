@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using TaskTracker.BLL.Binders;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Filter;
+using TaskTracker.BLL.BusinessModels.ProjectManagers.Links;
 using TaskTracker.BLL.BusinessModels.ProjectManagers.Sort;
 using TaskTracker.BLL.DTO.Project;
+using TaskTracker.BLL.DTO.ProjectTask;
 using TaskTracker.BLL.Interfaces;
-using TaskTracker.DAL.Entities;
+using TaskTracker.DAL.Entity;
 using TaskTracker.DAL.Interfaces;
 using TaskTracker.Models.ProjectManagers;
 using TaskTracker.Models.ProjectManagers.Date;
@@ -22,16 +23,6 @@ namespace TaskTracker.BLL.Services
         }
         public void CreateProject(ProjectPostDTO projectDTO)
         {
-            var context = new ValidationContext(projectDTO);
-            var results = new List<ValidationResult>();
-
-            if (!Validator.TryValidateObject(projectDTO, context, results))
-            {
-                var exceptionMessage = new StringBuilder();
-                foreach (var result in results)
-                    exceptionMessage.Append(result.ErrorMessage + '\n');
-                throw new Exception(exceptionMessage.ToString());
-            }
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<ProjectPostDTO, Project>()).CreateMapper();
             var project = mapper.Map<ProjectPostDTO, Project>(projectDTO);
             DataBase.ProjectRepository.Create(project);
@@ -49,38 +40,47 @@ namespace TaskTracker.BLL.Services
             if (project == null)
                 throw new ValidationException("Телефон не найден");
 
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<Project, ProjectDTO>()).CreateMapper();
+            var mapper = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Project, ProjectDTO>();
+                cfg.CreateMap<Project, ProjectTaskDTO>();
+            }).CreateMapper();
+
             return mapper.Map<Project, ProjectDTO>(project);
 
         }
 
-        public IEnumerable<ProjectDTO> GetProjects(DTO.Project.ProjectStatus? filterByStatus,
+        public IEnumerable<ProjectDTO> GetProjects(bool withTasks, ProjectStatus? filterByStatus,
                                                    SortBy? sortByPriority,
                                                    string? date,
                                                    TypeSearchDate? typeSearchDate)
         {
-
             var projects = DataBase.ProjectRepository.GetAll();
-            projects = SortAndFilter(projects, filterByStatus, sortByPriority, date, typeSearchDate);
+            var collectProjects = CollectProjects(withTasks, projects, filterByStatus, sortByPriority, date, typeSearchDate);
 
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<Project, ProjectDTO>()).CreateMapper();
+            var mapper = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Project, ProjectDTO>();
+                cfg.CreateMap<ProjectTask, ProjectTaskDTO>();
+            }).CreateMapper();
 
-            return mapper.Map<IEnumerable<Project>, List<ProjectDTO>>(projects);
+            return mapper.Map<IEnumerable<Project>, IEnumerable<ProjectDTO>>(collectProjects);
 
 
         }
 
-        private static IEnumerable<Project> SortAndFilter(IEnumerable<Project> projects,
-                                                   DTO.Project.ProjectStatus? filterByStatus,
+        private static IEnumerable<Project> CollectProjects(bool withTasks, IQueryable<Project> projects,
+                                                   ProjectStatus? filterByStatus,
                                                    SortBy? sortByPriority,
                                                    string? date,
                                                    TypeSearchDate? typeSearchDate)
         {
             var filterAndSort = new FilterAndSorterItems<Project>(new ProjectStatusFilter(filterByStatus),
-                                                                  new SortPriority(sortByPriority),
-                                                                  new DateSearch(date, typeSearchDate));
-            return filterAndSort.Process(projects);
+                                                                  new SortProjectPriority(sortByPriority),
+                                                                  new DateSearch(date, typeSearchDate), new TaskLink(withTasks));
+            var assemblingProjects = filterAndSort.Process(projects);
 
+            return assemblingProjects;
         }
 
         public void RemoveProject(int? id)

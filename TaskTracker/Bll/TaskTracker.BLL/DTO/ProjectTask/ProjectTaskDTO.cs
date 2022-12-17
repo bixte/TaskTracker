@@ -9,7 +9,6 @@ namespace TaskTracker.BLL.DTO.ProjectTask
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public int? Priority { get; set; }
-
         public ProjectTaskStatus? Status { get; set; }
         public int ProjectId { get; set; }
     }

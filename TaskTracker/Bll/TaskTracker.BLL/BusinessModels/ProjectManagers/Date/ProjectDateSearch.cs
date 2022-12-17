@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using TaskTracker.DAL.Entities;
+using TaskTracker.DAL.Entity;
 
 namespace TaskTracker.Models.ProjectManagers.Date
 {
@@ -14,7 +14,7 @@ namespace TaskTracker.Models.ProjectManagers.Date
             this.typeSearchDate = typeSearchDate;
         }
 
-        public IEnumerable<Project> Search(IEnumerable<Project> project)
+        public IQueryable<Project> Search(IQueryable<Project> project)
         {
             if (searchDate != null && typeSearchDate.HasValue)
             {
