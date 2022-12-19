@@ -17,7 +17,7 @@ namespace TaskTracker.Controllers
             this.projectTaskService = projectTaskService;
             this.projectTaskService = projectTaskService;
         }
-
+        [HttpGet]
         public ActionResult GetTasks(SortBy? sortPriority, ProjectTaskStatus? filterByStatus)
         {
             try
